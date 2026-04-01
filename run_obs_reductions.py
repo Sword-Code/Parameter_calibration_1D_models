@@ -69,7 +69,11 @@ def run_obs_reductions(conf, obs_ratio=0.25):
     # create a dictionary storing number of observations for each type in the reduced data-set 
 
     for observation_type in observed_types:
-        num_obs.update({observation_type:int(obs_ratio*len(observations_times_full[observation_type]))})
+        total_count=len(observations_times_full[observation_type])
+        if total_count==0:
+            num_obs[observation_type]=0
+        else:
+            num_obs[observation_type]=max(1, int(obs_ratio*total_count))
     
     if mpi.rank==0:
         # here there is an initialization to generate the sub-sets of observations corresponding to num_obs

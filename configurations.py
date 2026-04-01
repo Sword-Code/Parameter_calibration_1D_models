@@ -99,66 +99,6 @@ class BaseConfiguration:
                     "Expected at least one file matching 'result_????.nc'."
                 )
             # print(f'Found {self.n_ens_members} in model directory: {path_model}')
-
-
-class Boussole(BaseConfiguration):
-    name='Boussole'
-    
-    path_observations = "/g100_work/OGS_test2528/sspada00/SEAMLESS/BOUSSOLE_observations_w_sat.nc"  #supply path to observational file. The observational file is assumed to be containing 1D, or 2D arrays with (time) or (time, depth) dimensions, where time is always labeled as number of days from 01/01/1998 (it is daily resolution) and depth is always spaced by 1m (so N vertical layers means going N meters deep). For simplification no fluctuations in the sea level height are considered...
-
-    model_directory = "/g100_scratch/userexternal/ateruzzi/WP6_ms/BOUSSOLE/LARGE_ENSEMBLE_SIMULATIONS/BOUSSOLE_allparameters"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there
-    
-    observed_types = [
-        'Oxygen',
-        'Nitrate',
-        'Phosphate',
-        'Silicate',
-        'Satellite_chlorophyll',
-        # 'Insitu_chlorophyll',
-        ]   # observed types of variables
-
-
-class BoussoleSatOnly(Boussole):
-    name='BoussoleSatOnly'
-    
-    observed_types = [
-        # 'Oxygen',
-        # 'Nitrate',
-        # 'Phosphate',
-        # 'Silicate',
-        'Satellite_chlorophyll',
-        # 'Insitu_chlorophyll',
-        ]   # observed types of variables
-
-
-class BATS(BaseConfiguration):
-    name='BATS'
-    
-    path_observations = "/g100_work/OGS_test2528/sspada00/SEAMLESS/BATS_observations_w_chl_all_2sigma.nc"  #supply path to observational file. The observational file is assumed to be containing 1D, or 2D arrays with (time) or (time, depth) dimensions, where time is always labeled as number of days from 01/01/1998 (it is daily resolution) and depth is always spaced by 1m (so N vertical layers means going N meters deep). For simplification no fluctuations in the sea level height are considered...
-
-    model_directory = "/g100_scratch/userexternal/ateruzzi/WP6_ms/BATS/LARGE_ENSEMBLE_SIMULATIONS/BATS_allparameters"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there
-    
-    observed_types = [
-        'Oxygen',
-        'Nitrate',
-        'Phosphate',
-        'Silicate',
-        'Satellite_chlorophyll',
-        'Insitu_chlorophyll',
-        ]   # observed types of variables
-    
-
-class BATSSatOnly(BATS):
-    name='BATSSatOnly'
-    
-    observed_types = [
-        # 'Oxygen',
-        # 'Nitrate',
-        # 'Phosphate',
-        # 'Silicate',
-        'Satellite_chlorophyll',
-        # 'Insitu_chlorophyll',
-        ]   # observed types of variables
     
     
 class L4(BaseConfiguration):
@@ -190,7 +130,7 @@ class L4(BaseConfiguration):
     n_red_ens_members = 50  # this is the number of random realizations of sub-sampling of the observation data / of the perturbation noise
     
     
-class TestConf(BATS):
+class TestConf(BaseConfiguration):
     name='TestConf'
     n_ens_members=2
 

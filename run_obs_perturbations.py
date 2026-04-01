@@ -136,12 +136,12 @@ def run_obs_perturbations(conf, noise_scale=0.275):
     # this disctionary stores the mean and std across the noise realizations and outputs in .csv file        
     optimal_parameter_values = {}        
             
-    for reduction in range(0,n_red_ens_members):
-        best_ensemble_member.update({str(reduction):np.argwhere(RMSE[:,reduction]==np.amin(RMSE[:,reduction]))[0][0]+1})  # identify the ensemble member number corresponding to minimum RMSE
+    for noise in range(0,n_red_ens_members):
+        best_ensemble_member.update({str(noise):np.argwhere(RMSE[:,noise]==np.amin(RMSE[:,noise]))[0][0]+1})  # identify the ensemble member number corresponding to minimum RMSE
 
         for par_index, parameter in enumerate(perturbed_parameters_listed):
-            with eatpy.models.gotm.YAMLEnsemble(model_directory+"/fabm_"+str(best_ensemble_member[str(reduction)]).zfill(4)+".yaml", 1) as fabm:
-                parameters[par_index, reduction] = fabm["instances/"+parameter[:2]+"/parameters/"+parameter[3:]]
+            with eatpy.models.gotm.YAMLEnsemble(model_directory+"/fabm_"+str(best_ensemble_member[str(noise)]).zfill(4)+".yaml", 1) as fabm:
+                parameters[par_index, noise] = fabm["instances/"+parameter[:2]+"/parameters/"+parameter[3:]]
                 
 
     for par_index, parameter in enumerate(perturbed_parameters_listed):   

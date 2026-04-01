@@ -84,9 +84,18 @@ def run_obs_reductions(conf, obs_ratio=0.25):
             observations, indexes = init_subsamp.select_random_obs()
             reduced_obs.update({str(reduction):observations})
             total_indexes.update({str(reduction):indexes})
-            
-    reduced_obs=mpi.bcast(reduced_obs)
-    total_indexes=mpi.bcast(total_indexes)
+
+    # Broadcast only the shuffled indexes; each rank will reconstruct reduced_obs locally
+    total_indexes = mpi.bcast(total_indexes)
+
+    # Reconstruct reduced_obs on all ranks from observations_full and total_indexes
+    reduced_obs = {}
+    for reduction_key, indexes in total_indexes.items():
+        obs_subset = {}
+        for observation_type in observed_types:
+            obs_indices = indexes[observation_type]
+            obs_subset[observation_type] = observations_full[observation_type][obs_indices]
+        reduced_obs[reduction_key] = obs_subset
     
     # this is a loop through the model ensemble members, first extracting the full model data and then compiling an equivalent model set to the sub-sampled set of observations. It is done in two steps, so the netCDF files with model data are opened only once, which should save time..
 

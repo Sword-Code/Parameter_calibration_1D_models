@@ -67,14 +67,17 @@ def run_obs_perturbations(conf, noise_scale=0.275):
 
 
     # create a dictionary storing number of observations for each type in the reduced data-set 
+    
+    if mpi.rank==0:
+        for noise in range(0,n_red_ens_members):
 
-    for noise in range(0,n_red_ens_members):
-
-        obs={}
-        for observation_type in observed_types:
-            obs.update({observation_type:np.clip(observations_full[observation_type]*np.random.normal(loc=1.0, scale=noise_scale,size=len(observations_full[observation_type])),0,None)})
-        obs_with_noise.update({str(noise):obs})
-
+            obs={}
+            for observation_type in observed_types:
+                obs.update({observation_type:np.clip(observations_full[observation_type]*np.random.normal(loc=1.0, scale=noise_scale,size=len(observations_full[observation_type])),0,None)})
+            obs_with_noise.update({str(noise):obs})
+            
+    obs_with_noise=mpi.bcast(obs_with_noise)
+    
     for rank_count, member in enumerate(range(1+mpi.rank,n_mod_ens_members+1, mpi.size)): 
         
         print(member, flush=True)                

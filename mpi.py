@@ -31,6 +31,12 @@ class Mpi:
         if parallel:
             self.comm.barrier()
             
+    def bcast(self, sendobj, root=0):
+        if parallel:
+            return self.comm.bcast(sendobj, root=root)
+        else:
+            return sendobj
+            
     def print(self, msg, *args, **kwargs):
         if self.rank!=0:
             return

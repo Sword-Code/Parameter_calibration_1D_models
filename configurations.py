@@ -87,7 +87,9 @@ class BaseConfiguration:
         
         if self.n_ens_members is None:
             path_model=Path(self.model_directory)
+            assert path_model.exists()
             self.n_ens_members=len(list(path_model.glob('result_????.nc')))
+            assert self.n_ens_members>0
             # print(f'Found {self.n_ens_members} in model directory: {path_model}')
 
 

@@ -77,13 +77,17 @@ def run_obs_reductions(conf, obs_ratio=0.25):
 
 
     # in the loop below the observations are drawn across the n_red_ensemble_mem=50 realizations
+    
+    if mpi.rank==0:
+        for reduction in range(0, n_red_ens_members):
 
-    for reduction in range(0, n_red_ens_members):
-
-        observations, indexes = init_subsamp.select_random_obs()
-        reduced_obs.update({str(reduction):observations})
-        total_indexes.update({str(reduction):indexes})
-
+            observations, indexes = init_subsamp.select_random_obs()
+            reduced_obs.update({str(reduction):observations})
+            total_indexes.update({str(reduction):indexes})
+            
+    reduced_obs=mpi.bcast(reduced_obs)
+    total_indexes=mpi.bcast(total_indexes)
+    
     # this is a loop through the model ensemble members, first extracting the full model data and then compiling an equivalent model set to the sub-sampled set of observations. It is done in two steps, so the netCDF files with model data are opened only once, which should save time..
 
     for rank_count, member in enumerate(range(1+mpi.rank,n_mod_ens_members+1, mpi.size)): 

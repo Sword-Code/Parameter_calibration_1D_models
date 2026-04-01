@@ -81,8 +81,8 @@ def match_model_with_observations(path_mod, model_types, observed_types, observa
 
         for observed_type, model_type in zip(observed_types, model_types):   # run through all observed variables
             
-            if ("total_chlorophyll_calculator_result" in model_type) & ~("total_chlorophyll_calculator_result" in modinp.variables.keys()):  # error?
-            # if ("total_chlorophyll_calculator_result" == model_type) & ~("total_chlorophyll_calculator_result" in modinp.variables.keys()):  # is this the correct one?
+            if ("total_chlorophyll_calculator_result" in model_type) and ("total_chlorophyll_calculator_result" not in modinp.variables.keys()):  # error?
+            # if ("total_chlorophyll_calculator_result" == model_type) and ("total_chlorophyll_calculator_result" not in modinp.variables.keys()):  # is this the correct one?
                 model = modinp.variables["P1_Chl"][:] + modinp.variables["P2_Chl"][:] + modinp.variables["P3_Chl"][:] + modinp.variables["P4_Chl"][:] # model data for specific type
             else:                       
                 model = modinp.variables[model_type][:]  # model data for specific type

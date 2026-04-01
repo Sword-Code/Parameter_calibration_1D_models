@@ -87,7 +87,17 @@ class BaseConfiguration:
         
         if self.n_ens_members is None:
             path_model=Path(self.model_directory)
+            if not path_model.exists():
+                raise FileNotFoundError(
+                    f"Model directory '{self.model_directory}' does not exist; "
+                    "expected to find ensemble files matching 'result_????.nc'."
+                )
             self.n_ens_members=len(list(path_model.glob('result_????.nc')))
+            if self.n_ens_members <= 0:
+                raise ValueError(
+                    f"No ensemble members found in directory '{self.model_directory}'. "
+                    "Expected at least one file matching 'result_????.nc'."
+                )
             # print(f'Found {self.n_ens_members} in model directory: {path_model}')
 
 

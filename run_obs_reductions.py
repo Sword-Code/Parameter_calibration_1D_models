@@ -70,20 +70,33 @@ def run_obs_reductions(conf, obs_ratio=0.25):
 
     for observation_type in observed_types:
         num_obs.update({observation_type:int(obs_ratio*len(observations_times_full[observation_type]))})
+    
+    if mpi.rank==0:
+        # here there is an initialization to generate the sub-sets of observations corresponding to num_obs
 
-    # here there is an initialization to generate the sub-sets of observations corresponding to num_obs
+        init_subsamp = cm.calibrate_model(obs_types = observed_types, observations=observations_full, num_obs=num_obs)
+        
+        # in the loop below the observations are drawn across the n_red_ensemble_mem=50 realizations
+        
+        for reduction in range(0, n_red_ens_members):
 
-    init_subsamp = cm.calibrate_model(obs_types = observed_types, observations=observations_full, num_obs=num_obs)
+            observations, indexes = init_subsamp.select_random_obs()
+            reduced_obs.update({str(reduction):observations})
+            total_indexes.update({str(reduction):indexes})
 
+    # Broadcast only the shuffled indexes; each rank will reconstruct reduced_obs locally
+    total_indexes = mpi.bcast(total_indexes)
 
-    # in the loop below the observations are drawn across the n_red_ensemble_mem=50 realizations
-
-    for reduction in range(0, n_red_ens_members):
-
-        observations, indexes = init_subsamp.select_random_obs()
-        reduced_obs.update({str(reduction):observations})
-        total_indexes.update({str(reduction):indexes})
-
+    # Reconstruct reduced_obs on all ranks from observations_full and total_indexes
+    reduced_obs = {}
+    for reduction_key, indexes in total_indexes.items():
+        obs_subset = {}
+        for observation_type in observed_types:
+            # Use only the first num_obs indices to match the reduced observation subset size
+            obs_indices = indexes[observation_type][:num_obs[observation_type]]
+            obs_subset[observation_type] = observations_full[observation_type][obs_indices]
+        reduced_obs[reduction_key] = obs_subset
+    
     # this is a loop through the model ensemble members, first extracting the full model data and then compiling an equivalent model set to the sub-sampled set of observations. It is done in two steps, so the netCDF files with model data are opened only once, which should save time..
 
     for rank_count, member in enumerate(range(1+mpi.rank,n_mod_ens_members+1, mpi.size)): 

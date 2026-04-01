@@ -70,15 +70,14 @@ def run_obs_reductions(conf, obs_ratio=0.25):
 
     for observation_type in observed_types:
         num_obs.update({observation_type:int(obs_ratio*len(observations_times_full[observation_type]))})
-
-    # here there is an initialization to generate the sub-sets of observations corresponding to num_obs
-
-    init_subsamp = cm.calibrate_model(obs_types = observed_types, observations=observations_full, num_obs=num_obs)
-
-
-    # in the loop below the observations are drawn across the n_red_ensemble_mem=50 realizations
     
     if mpi.rank==0:
+        # here there is an initialization to generate the sub-sets of observations corresponding to num_obs
+
+        init_subsamp = cm.calibrate_model(obs_types = observed_types, observations=observations_full, num_obs=num_obs)
+        
+        # in the loop below the observations are drawn across the n_red_ensemble_mem=50 realizations
+        
         for reduction in range(0, n_red_ens_members):
 
             observations, indexes = init_subsamp.select_random_obs()

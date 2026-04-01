@@ -93,7 +93,8 @@ def run_obs_reductions(conf, obs_ratio=0.25):
     for reduction_key, indexes in total_indexes.items():
         obs_subset = {}
         for observation_type in observed_types:
-            obs_indices = indexes[observation_type]
+            # Use only the first num_obs indices to match the reduced observation subset size
+            obs_indices = indexes[observation_type][:num_obs[observation_type]]
             obs_subset[observation_type] = observations_full[observation_type][obs_indices]
         reduced_obs[reduction_key] = obs_subset
     

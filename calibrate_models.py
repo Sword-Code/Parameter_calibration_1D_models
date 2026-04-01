@@ -27,7 +27,10 @@ def read_observations(path_obs, observed_types, start_obs_index, end_obs_index, 
             if obs.variables[observed_type][:].ndim==2:  # if the variable is 2D (time x depth)
                 observations_spec_inputs = obs.variables[observed_type][:]
                 observations_spec_inputs = observations_spec_inputs[start_obs_index:end_obs_index,:] 
-                relevant = (observations_spec_inputs != mask) & ~np.isnan(observations_spec_inputs) & observations_spec_inputs.mask==False
+                relevant = np.logical_and(np.logical_and(
+                    observations_spec_inputs != mask, 
+                    np.isnan(observations_spec_inputs)==False),
+                    observations_spec_inputs.mask==False)
                 observations_spec = observations_spec_inputs[relevant]  # flattened array with observations
                 observations_spec_depth = np.argwhere(relevant)[:,1]  # flattened array with observational depths (adding 0.5 puts it in the centre of the 1m thick layer)  
                 observations_spec_time = np.argwhere(relevant)[:,0]  # flattened array with times of observations
@@ -35,7 +38,7 @@ def read_observations(path_obs, observed_types, start_obs_index, end_obs_index, 
     
             else:  # this means the variable is 1D (time)
                 observations_spec_inputs = np.array(obs.variables[observed_type])[start_obs_index:end_obs_index]
-                relevant = (observations_spec_inputs != mask) & ~np.isnan(observations_spec_inputs) 
+                relevant = np.logical_and(observations_spec_inputs != mask, np.isnan(observations_spec_inputs)==False)
                 observations_spec = observations_spec_inputs[relevant]  # flattened array with observations 
                 observations_spec_time = np.argwhere(relevant)[:,0]  # flattened array with times of observations
                 observations_spec_depth = np.zeros((len(observations_spec_time))) #formally set "surface" data depths to 0.5m 

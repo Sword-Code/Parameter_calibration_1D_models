@@ -67,6 +67,7 @@ def run_obs_perturbations(conf, noise_scale=0.275):
 
 
     # create a dictionary storing number of observations for each type in the reduced data-set 
+    randomization = None
     if mpi.rank==0:
         randomization=np.random.randint(10**6)
     randomization=mpi.bcast(randomization)

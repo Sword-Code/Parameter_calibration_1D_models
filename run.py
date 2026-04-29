@@ -71,7 +71,7 @@ def run(conf):
             )
         RMSE[rank_count] = calibration_init.RMSE_metric()
         
-    # RMSE reconstruction at rank 0 (or mpi.root)
+    # RMSE reconstruction on mpi.root
     
     RMSEs=mpi.gather(RMSE)
     if mpi.rank!=mpi.root:

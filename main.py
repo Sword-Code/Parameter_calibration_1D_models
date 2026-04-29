@@ -7,7 +7,8 @@ from configurations import Boussole, BoussoleSatOnly, BATS, BATSSatOnly, TestCon
 
 
 def main():
-    # mpi.root=2500 # uncomment this line if you want to specify a preferred root (e.g., 2500)
+    # mpi.root = 0  # Uncomment to specify a preferred root rank.
+    # Valid values are in the range [0, mpi.size); invalid values may raise ValueError.
     
     confs=[
         # TestConf(),

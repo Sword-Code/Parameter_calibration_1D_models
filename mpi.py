@@ -34,7 +34,7 @@ class Mpi:
         if new_root<0:
             raise ValueError(f"mpi.root ({new_root}) must be >= 0")
         if new_root>=self.size:
-            raise ValueError(f'mpi.root ({new_root}) must be < MPI size ({mpi.size})')
+            raise ValueError(f'mpi.root ({new_root}) must be < MPI size ({self.size})')
         self._root=new_root
         
     def gather(self, sendobj, root=None):

@@ -7,7 +7,7 @@ from configurations import Boussole, BoussoleSatOnly, BATS, BATSSatOnly, TestCon
 
 
 def main():
-    mpi.root=2500
+    # mpi.root=2500 # uncomment this line if you want to specify a preferred root (e.g., 2500)
     
     confs=[
         # TestConf(),

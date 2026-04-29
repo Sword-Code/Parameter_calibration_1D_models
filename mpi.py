@@ -25,7 +25,7 @@ class Mpi:
     
     @property
     def root(self):
-        return _root
+        return self._root
     
     @root.setter
     def root(self, new_root):

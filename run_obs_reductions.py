@@ -141,7 +141,7 @@ def run_obs_reductions(conf, obs_ratio=0.25):
             RMSE[rank_count, reduction] = calibration_init.RMSE_metric()
 
         
-    # RMSE reconstruction at rank 0 (or mpi.root)
+    # RMSE reconstruction on mpi.root
     
     RMSEs=mpi.gather(RMSE)
     if mpi.rank!=mpi.root:

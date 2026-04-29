@@ -8,8 +8,6 @@ else:
     
 class Mpi:
     
-    _root=0
-    
     def __init__(self, comm=None, root=0):
         if parallel:
             if comm is None:

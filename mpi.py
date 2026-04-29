@@ -70,8 +70,9 @@ class Mpi:
 mpi=Mpi() 
 
 def main():
-    node_list=mpi.gather(MPI.Get_processor_name())
-    if mpi.rank!=0:
+    node_name = MPI.Get_processor_name() if parallel else "serial"
+    node_list = mpi.gather(node_name)
+    if mpi.rank != mpi.root:
         return
     node_dict={}
     s=""

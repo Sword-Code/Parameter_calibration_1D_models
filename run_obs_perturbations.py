@@ -118,7 +118,7 @@ def run_obs_perturbations(conf, noise_scale=0.275):
 
             RMSE[rank_count, noise] = calibration_init.RMSE_metric()
             
-    # RMSE reconstruction at rank 0 (or mpi.root)
+    # RMSE reconstruction on mpi.root
     
     RMSEs=mpi.gather(RMSE)
     if mpi.rank!=mpi.root:

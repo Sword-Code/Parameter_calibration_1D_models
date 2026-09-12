@@ -54,7 +54,25 @@ class Mpi:
             return self.comm.bcast(sendobj, root=root)
         else:
             return sendobj
+        
+    def split(self, color=0, key=0):
+        if parallel:
+            new_comm=self.comm.split(color=color, key=key)
+        else:
+            new_comm=None
+        return self.__class__(comm=new_comm)
+        
+    def reduce(self, sendobj, op=None, root=None):
+        if root is None:
+            root=self.root
+        if parallel:
+            if op is None:
+                op=MPI.SUM
+            return self.comm.reduce(sendobj, op=op, root=root)
+        else:
+            return sendobj
             
+        
     def print(self, msg, *args, root=None, **kwargs):
         if root is None:
             root=self.root

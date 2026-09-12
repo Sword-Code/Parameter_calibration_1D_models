@@ -104,16 +104,16 @@ class BaseConfiguration:
             # print(f'Found {self.n_ens_members} in model directory: {path_model}')
             
         if self.n_ens_members_separately is None:
-            path_model=Path(self.model_directory_separately)
+            path_model=Path(self.model_directory_separately.format(perturbed_parameters_listed[0]))
             if not path_model.exists():
                 raise FileNotFoundError(
-                    f"Model directory '{self.model_directory_separately}' does not exist; "
+                    f"Model directory '{self.model_directory_separately.format(perturbed_parameters_listed[0])}' does not exist; "
                     "expected to find ensemble files matching 'result_????.nc'."
                 )
             self.n_ens_members_separately=len(list(path_model.glob('result_????.nc')))
             if self.n_ens_members_separately <= 0:
                 raise FileNotFoundError(
-                    f"No ensemble members found in directory '{self.model_directory_separately}'. "
+                    f"No ensemble members found in directory '{self.model_directory_separately.format(perturbed_parameters_listed[0])}'. "
                     "Expected at least one file matching 'result_????.nc'."
                 )
             # print(f'Found {self.n_ens_members_separately} in model directory: {path_model}')
@@ -192,7 +192,7 @@ class L4(BaseConfiguration):
 
     model_directory = "/work/jos/eat/1D_configuration/L4/large_ensemble"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there
     
-    model_directory_separately = "/work/jos/eat/1D_configuration/L4/pars_one"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there. Used in run_pars_separately
+    model_directory_separately = "/work/jos/eat/1D_configuration/L4/pars_one/{}"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there. Used in run_pars_separately
 
     perturbed_parameters_listed = ["B1_rR2", "B1_sR1", "P1_alpha", "B1_rR3", "B1_frR3", "B1_srs", "P2_alpha", "P1_sum", "B1_q10", "B1_pu", "P2_srs", "P1_srs", "P1_xqcn", "P2_xqcn", "P2_xqn", "P1_xqn"]   # parameters calibrated..
 

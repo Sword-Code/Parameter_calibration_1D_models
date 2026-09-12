@@ -138,7 +138,7 @@ def run_pars_separately(conf):
     
 def unroll(list_of_lists):
     result=[]
-    for l in my_list:
+    for l in list_of_lists:
         result.extend(l)
     return result
 

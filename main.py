@@ -3,6 +3,7 @@ from run import run
 from run_seasons import run_seasons
 from run_obs_reductions import run_obs_reductions
 from run_obs_perturbations import run_obs_perturbations
+from run_pars_separately import run_pars_separately
 from configurations import Boussole, BoussoleSatOnly, BATS, BATSSatOnly, TestConf
 
 

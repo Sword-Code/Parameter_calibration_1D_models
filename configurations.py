@@ -76,6 +76,48 @@ class BaseConfiguration:
     ########################
     
     _save_dir=None
+    _n_ens_members = n_ens_members
+    _n_ens_members_separately = n_ens_members_separately
+    
+    @property
+    def _property_n_ens_members(self):
+        if self._n_ens_members is None:
+            path_model=Path(self.model_directory)
+            if not path_model.exists():
+                raise FileNotFoundError(
+                    f"Model directory '{self.model_directory}' does not exist; "
+                    "expected to find ensemble files matching 'result_????.nc'."
+                )
+            self._n_ens_members=len(list(path_model.glob('result_????.nc')))
+            if self._n_ens_members <= 0:
+                raise FileNotFoundError(
+                    f"No ensemble members found in directory '{self.model_directory}'. "
+                    "Expected at least one file matching 'result_????.nc'."
+                )
+            # print(f'Found {self._n_ens_members} in model directory: {path_model}')
+        return self._n_ens_members
+        
+    @property
+    def _property_n_ens_members_separately(self):
+        if self._n_ens_members_separately is None:
+            parameter = self.perturbed_parameters_listed[0]
+            path_model=Path(self.model_directory_separately.format(parameter))
+            if not path_model.exists():
+                raise FileNotFoundError(
+                    f"Model directory '{self.model_directory_separately.format(parameter)}' does not exist; "
+                    "expected to find ensemble files matching 'result_????.nc'."
+                )
+            self._n_ens_members_separately=len(list(path_model.glob('result_????.nc')))
+            if self._n_ens_members_separately <= 0:
+                raise FileNotFoundError(
+                    f"No ensemble members found in directory '{self.model_directory_separately.format(parameter)}'."
+                    "Expected at least one file matching 'result_????.nc'."
+                )
+            # print(f'Found {self.n_ens_members_separately} in model directory: {path_model}')
+        return self._n_ens_members_separately
+    
+    n_ens_members = _property_n_ens_members
+    n_ens_members_separately = _property_n_ens_members_separately
     
     @property
     def save_dir(self):
@@ -88,36 +130,15 @@ class BaseConfiguration:
         if self.model_types is None:
             self.model_types=[self._dict_model_variables[observed_type] for observed_type in self.observed_types]
         
-        if self.n_ens_members is None:
-            path_model=Path(self.model_directory)
-            if not path_model.exists():
-                raise FileNotFoundError(
-                    f"Model directory '{self.model_directory}' does not exist; "
-                    "expected to find ensemble files matching 'result_????.nc'."
-                )
-            self.n_ens_members=len(list(path_model.glob('result_????.nc')))
-            if self.n_ens_members <= 0:
-                raise FileNotFoundError(
-                    f"No ensemble members found in directory '{self.model_directory}'. "
-                    "Expected at least one file matching 'result_????.nc'."
-                )
-            # print(f'Found {self.n_ens_members} in model directory: {path_model}')
+    def __init_subclass__(cls, **kwargs):
+        
+        if cls.n_ens_members is None:
+            cls._n_ens_members = None
+            cls.n_ens_members=cls._property_n_ens_members
             
-        if self.n_ens_members_separately is None:
-            parameter = self.perturbed_parameters_listed[0]
-            path_model=Path(self.model_directory_separately.format(parameter))
-            if not path_model.exists():
-                raise FileNotFoundError(
-                    f"Model directory '{self.model_directory_separately.format(parameter)}' does not exist; "
-                    "expected to find ensemble files matching 'result_????.nc'."
-                )
-            self.n_ens_members_separately=len(list(path_model.glob('result_????.nc')))
-            if self.n_ens_members_separately <= 0:
-                raise FileNotFoundError(
-                    f"No ensemble members found in directory '{self.model_directory_separately.format(parameter)}'."
-                    "Expected at least one file matching 'result_????.nc'."
-                )
-            # print(f'Found {self.n_ens_members_separately} in model directory: {path_model}')
+        if cls.n_ens_members_separately is None:
+            cls._n_ens_members_separately = None
+            cls.n_ens_members_separately=cls._property_n_ens_members_separately
 
 
 class Boussole(BaseConfiguration):

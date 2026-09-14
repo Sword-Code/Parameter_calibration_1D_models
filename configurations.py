@@ -239,6 +239,7 @@ class L4(BaseConfiguration):
 class TestConf(BATS):
     name='TestConf'
     n_ens_members=2
+    n_ens_members_separately=2
 
 
 chosen_conf=TestConf()

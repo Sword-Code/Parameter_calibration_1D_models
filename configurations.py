@@ -104,16 +104,17 @@ class BaseConfiguration:
             # print(f'Found {self.n_ens_members} in model directory: {path_model}')
             
         if self.n_ens_members_separately is None:
-            path_model=Path(self.model_directory_separately.format(perturbed_parameters_listed[0]))
+            parameter = self.perturbed_parameters_listed[0]
+            path_model=Path(self.model_directory_separately.format(parameter))
             if not path_model.exists():
                 raise FileNotFoundError(
-                    f"Model directory '{self.model_directory_separately.format(perturbed_parameters_listed[0])}' does not exist; "
+                    f"Model directory '{self.model_directory_separately.format(parameter)}' does not exist; "
                     "expected to find ensemble files matching 'result_????.nc'."
                 )
             self.n_ens_members_separately=len(list(path_model.glob('result_????.nc')))
             if self.n_ens_members_separately <= 0:
                 raise FileNotFoundError(
-                    f"No ensemble members found in directory '{self.model_directory_separately.format(perturbed_parameters_listed[0])}'. "
+                    f"No ensemble members found in directory '{self.model_directory_separately.format(parameter)}'."
                     "Expected at least one file matching 'result_????.nc'."
                 )
             # print(f'Found {self.n_ens_members_separately} in model directory: {path_model}')

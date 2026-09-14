@@ -57,7 +57,7 @@ class Mpi:
         
     def split(self, color=0, key=0):
         if parallel:
-            new_comm=self.comm.split(color=color, key=key)
+            new_comm=self.comm.Split(color=color, key=key)
         else:
             new_comm=None
         return self.__class__(comm=new_comm)

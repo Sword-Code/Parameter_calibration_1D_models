@@ -117,6 +117,7 @@ class BaseConfiguration:
                     and self._n_ens_members_separately!=_n_ens_members_separately):
                     raise ValueError(
                         f"Model directory '{self.model_directory_separately.format(parameter)}' contains " f"{_n_ens_members_separately} members, while " f"'{self.model_directory_separately.format(self.perturbed_parameters_listed[par-1])}' " f"contains a different ensemble size ({self._n_ens_members_separately} members)."
+                        )
                 self._n_ens_members_separately=_n_ens_members_separately
             # print(f'Found {self._n_ens_members_separately} in model directory: {path_model}')
         return self._n_ens_members_separately

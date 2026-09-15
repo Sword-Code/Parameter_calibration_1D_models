@@ -134,7 +134,7 @@ def run_pars_separately(conf):
             # write every key and value to file
             w.writerow([key, val])
         
-    mpi.print(f"routine: run_pars_separately, conf: {conf.name}. Done!")
+    mpi_splitted.print(f"routine: run_pars_separately, conf: {conf.name}. Done!")
     
 def unroll(list_of_lists):
     result=[]

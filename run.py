@@ -71,10 +71,10 @@ def run(conf):
             )
         RMSE[rank_count] = calibration_init.RMSE_metric()
         
-    # RMSE reconstruction at rank 0
+    # RMSE reconstruction on mpi.root
     
     RMSEs=mpi.gather(RMSE)
-    if mpi.rank!=0:
+    if mpi.rank!=mpi.root:
         return
     RMSE=np.array(RMSEs).transpose().reshape((-1))
     assert len(RMSE)>=n_ens_members

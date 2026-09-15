@@ -68,7 +68,7 @@ def run_obs_perturbations(conf, noise_scale=0.275):
 
     # create a dictionary storing number of observations for each type in the reduced data-set 
     randomization = None
-    if mpi.rank==0:
+    if mpi.rank==mpi.root:
         randomization=np.random.randint(10**6)
     randomization=mpi.bcast(randomization)
     for noise in range(0,n_red_ens_members):
@@ -118,10 +118,10 @@ def run_obs_perturbations(conf, noise_scale=0.275):
 
             RMSE[rank_count, noise] = calibration_init.RMSE_metric()
             
-    # RMSE reconstruction at rank 0
+    # RMSE reconstruction on mpi.root
     
     RMSEs=mpi.gather(RMSE)
-    if mpi.rank!=0:
+    if mpi.rank!=mpi.root:
         return
     RMSE=np.array(RMSEs).transpose((1,0,2)).reshape((-1, n_red_ens_members))
     assert len(RMSE)>=n_mod_ens_members

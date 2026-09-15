@@ -110,7 +110,7 @@ class BaseConfiguration:
             self._n_ens_members_separately=len(list(path_model.glob('result_????.nc')))
             if self._n_ens_members_separately <= 0:
                 raise FileNotFoundError(
-                    f"No ensemble members found in directory '{self.model_directory_separately.format(parameter)}'."
+                    f"No ensemble members found in directory '{self.model_directory_separately.format(parameter)}'. "
                     "Expected at least one file matching 'result_????.nc'."
                 )
             # print(f'Found {self.n_ens_members_separately} in model directory: {path_model}')

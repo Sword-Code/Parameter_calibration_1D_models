@@ -12,6 +12,8 @@ class BaseConfiguration:
 
     model_directory = "BATS_results"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there
     
+    model_directory_separately = "BATS_{}"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there. Used in run_pars_separately
+    
     output_dir = "outputs"  # path to outputs (csv and txt) folder 
 
     perturbed_parameters_listed = [
@@ -63,6 +65,7 @@ class BaseConfiguration:
 
     n_ens_members = None # number of model ensemble members used. If None, it automatically takes the maximum available number.
     
+    n_ens_members_separately = None # number of model ensemble members used. If None, it automatically takes the maximum available number. Used in run_pars_separately
     
     # only for obs_reduction and obs_perturbation: 
     
@@ -73,6 +76,53 @@ class BaseConfiguration:
     ########################
     
     _save_dir=None
+    _n_ens_members = n_ens_members
+    _n_ens_members_separately = n_ens_members_separately
+    
+    @property
+    def _property_n_ens_members(self):
+        if self._n_ens_members is None:
+            path_model=Path(self.model_directory)
+            if not path_model.exists():
+                raise FileNotFoundError(
+                    f"Model directory '{self.model_directory}' does not exist; "
+                    "expected to find ensemble files matching 'result_????.nc'."
+                )
+            self._n_ens_members=len(list(path_model.glob('result_????.nc')))
+            if self._n_ens_members <= 0:
+                raise FileNotFoundError(
+                    f"No ensemble members found in directory '{self.model_directory}'. "
+                    "Expected at least one file matching 'result_????.nc'."
+                )
+            # print(f'Found {self._n_ens_members} in model directory: {path_model}')
+        return self._n_ens_members
+        
+    @property
+    def _property_n_ens_members_separately(self):
+        if self._n_ens_members_separately is None:
+            for par, parameter in enumerate(self.perturbed_parameters_listed):
+                path_model=Path(self.model_directory_separately.format(parameter))
+                if not path_model.exists():
+                    raise FileNotFoundError(
+                        f"Model directory '{self.model_directory_separately.format(parameter)}' does not exist; "
+                        "expected to find ensemble files matching 'result_????.nc'."
+                )
+                _n_ens_members_separately=len(list(path_model.glob('result_????.nc')))
+                if _n_ens_members_separately <= 0:
+                    raise FileNotFoundError(
+                        f"No ensemble members found in directory '{self.model_directory_separately.format(parameter)}'. "
+                        "Expected at least one file matching 'result_????.nc'."
+                    )
+                if (self._n_ens_members_separately is not None
+                    and self._n_ens_members_separately!=_n_ens_members_separately):
+                    raise ValueError(
+                        f"Model directory '{self.model_directory_separately.format(parameter)}' contains " f"{_n_ens_members_separately} members, while " f"'{self.model_directory_separately.format(self.perturbed_parameters_listed[par-1])}' " f"contains a different ensemble size ({self._n_ens_members_separately} members)."
+                self._n_ens_members_separately=_n_ens_members_separately
+            # print(f'Found {self._n_ens_members_separately} in model directory: {path_model}')
+        return self._n_ens_members_separately
+    
+    n_ens_members = _property_n_ens_members
+    n_ens_members_separately = _property_n_ens_members_separately
     
     @property
     def save_dir(self):
@@ -85,20 +135,15 @@ class BaseConfiguration:
         if self.model_types is None:
             self.model_types=[self._dict_model_variables[observed_type] for observed_type in self.observed_types]
         
-        if self.n_ens_members is None:
-            path_model=Path(self.model_directory)
-            if not path_model.exists():
-                raise FileNotFoundError(
-                    f"Model directory '{self.model_directory}' does not exist; "
-                    "expected to find ensemble files matching 'result_????.nc'."
-                )
-            self.n_ens_members=len(list(path_model.glob('result_????.nc')))
-            if self.n_ens_members <= 0:
-                raise ValueError(
-                    f"No ensemble members found in directory '{self.model_directory}'. "
-                    "Expected at least one file matching 'result_????.nc'."
-                )
-            # print(f'Found {self.n_ens_members} in model directory: {path_model}')
+    def __init_subclass__(cls, **kwargs):
+        
+        if cls.n_ens_members is None:
+            cls._n_ens_members = None
+            cls.n_ens_members=cls._property_n_ens_members
+            
+        if cls.n_ens_members_separately is None:
+            cls._n_ens_members_separately = None
+            cls.n_ens_members_separately=cls._property_n_ens_members_separately
 
 
 class Boussole(BaseConfiguration):
@@ -107,6 +152,8 @@ class Boussole(BaseConfiguration):
     path_observations = "/g100_work/OGS_test2528/sspada00/SEAMLESS/BOUSSOLE_observations_w_sat.nc"  #supply path to observational file. The observational file is assumed to be containing 1D, or 2D arrays with (time) or (time, depth) dimensions, where time is always labeled as number of days from 01/01/1998 (it is daily resolution) and depth is always spaced by 1m (so N vertical layers means going N meters deep). For simplification no fluctuations in the sea level height are considered...
 
     model_directory = "/g100_scratch/userexternal/ateruzzi/WP6_ms/BOUSSOLE/LARGE_ENSEMBLE_SIMULATIONS/BOUSSOLE_allparameters"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there
+    
+    model_directory_separately = "/g100_scratch/userexternal/ateruzzi/WP6_ms/BOUSSOLE/LARGE_ENSEMBLE_SIMULATIONS/BOUSSOLE_{}"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there. Used in run_pars_separately
     
     observed_types = [
         'Oxygen',
@@ -137,6 +184,8 @@ class BATS(BaseConfiguration):
     path_observations = "/g100_work/OGS_test2528/sspada00/SEAMLESS/BATS_observations_w_chl_all_2sigma.nc"  #supply path to observational file. The observational file is assumed to be containing 1D, or 2D arrays with (time) or (time, depth) dimensions, where time is always labeled as number of days from 01/01/1998 (it is daily resolution) and depth is always spaced by 1m (so N vertical layers means going N meters deep). For simplification no fluctuations in the sea level height are considered...
 
     model_directory = "/g100_scratch/userexternal/ateruzzi/WP6_ms/BATS/LARGE_ENSEMBLE_SIMULATIONS/BATS_allparameters"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there
+    
+    model_directory_separately = "/g100_scratch/userexternal/ateruzzi/WP6_ms/BATS/LARGE_ENSEMBLE_SIMULATIONS/BATS_{}"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there. Used in run_pars_separately
     
     observed_types = [
         'Oxygen',
@@ -169,6 +218,8 @@ class L4(BaseConfiguration):
     path_observations = "./L4_observations.nc"  #supply path to observational file. The observational file is assumed to be containing 1D, or 2D arrays with (time) or (time, depth) dimensions, where time is always labeled as number of days from 01/01/1998 (it is daily resolution) and depth is always spaced by 1m (so N vertical layers means going N meters deep). For simplification no fluctuations in the sea level height are considered...
 
     model_directory = "/work/jos/eat/1D_configuration/L4/large_ensemble"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there
+    
+    model_directory_separately = "/work/jos/eat/1D_configuration/L4/pars_one/{}"    # path to folder with the model ensemble simulations - the model outputs are picked across the ensemble from there. Used in run_pars_separately
 
     perturbed_parameters_listed = ["B1_rR2", "B1_sR1", "P1_alpha", "B1_rR3", "B1_frR3", "B1_srs", "P2_alpha", "P1_sum", "B1_q10", "B1_pu", "P2_srs", "P1_srs", "P1_xqcn", "P2_xqcn", "P2_xqn", "P1_xqn"]   # parameters calibrated..
 
@@ -193,6 +244,7 @@ class L4(BaseConfiguration):
 class TestConf(BATS):
     name='TestConf'
     n_ens_members=2
+    n_ens_members_separately=2
 
 
 chosen_conf=TestConf()

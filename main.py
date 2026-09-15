@@ -3,6 +3,7 @@ from run import run
 from run_seasons import run_seasons
 from run_obs_reductions import run_obs_reductions
 from run_obs_perturbations import run_obs_perturbations
+from run_pars_separately import run_pars_separately
 from configurations import Boussole, BoussoleSatOnly, BATS, BATSSatOnly, TestConf
 
 
@@ -25,6 +26,7 @@ def main():
             run_obs_reductions(conf, obs_ratio=0.5**i)
         for noise_scale in [0.15, 0.275, 0.5]:
             run_obs_perturbations(conf, noise_scale=noise_scale)
+        run_pars_separately(conf)
 
 if __name__=="__main__":
     main()

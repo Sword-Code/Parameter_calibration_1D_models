@@ -75,7 +75,7 @@ def run_obs_reductions(conf, obs_ratio=0.25):
         else:
             num_obs[observation_type]=max(1, int(obs_ratio*total_count))
     
-    if mpi.rank==0:
+    if mpi.rank==mpi.root:
         # here there is an initialization to generate the sub-sets of observations corresponding to num_obs
 
         init_subsamp = cm.calibrate_model(obs_types = observed_types, observations=observations_full, num_obs=num_obs)
@@ -141,10 +141,10 @@ def run_obs_reductions(conf, obs_ratio=0.25):
             RMSE[rank_count, reduction] = calibration_init.RMSE_metric()
 
         
-    # RMSE reconstruction at rank 0
+    # RMSE reconstruction on mpi.root
     
     RMSEs=mpi.gather(RMSE)
-    if mpi.rank!=0:
+    if mpi.rank!=mpi.root:
         return
     RMSE=np.array(RMSEs).transpose((1,0,2)).reshape((-1, n_red_ens_members))
     assert len(RMSE)>=n_mod_ens_members

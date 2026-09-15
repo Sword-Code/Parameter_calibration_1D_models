@@ -106,10 +106,10 @@ def run_seasons(conf):
                 )
             RMSE[season][rank_count] = calibration_init.RMSE_metric()
     
-    # RMSE reconstruction at rank 0
+    # RMSE reconstruction on mpi.root
     
     RMSEs=mpi.gather(RMSE)
-    if mpi.rank!=0:
+    if mpi.rank!=mpi.root:
         return
     RMSE={season:np.array([RMSE_part[season] for RMSE_part in RMSEs]).transpose().reshape((-1)) for season in seasons}
     for season in seasons:

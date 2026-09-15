@@ -100,20 +100,25 @@ class BaseConfiguration:
     @property
     def _property_n_ens_members_separately(self):
         if self._n_ens_members_separately is None:
-            parameter = self.perturbed_parameters_listed[0]
-            path_model=Path(self.model_directory_separately.format(parameter))
-            if not path_model.exists():
-                raise FileNotFoundError(
-                    f"Model directory '{self.model_directory_separately.format(parameter)}' does not exist; "
-                    "expected to find ensemble files matching 'result_????.nc'."
+            for par, parameter in enumerate(self.perturbed_parameters_listed):
+                path_model=Path(self.model_directory_separately.format(parameter))
+                if not path_model.exists():
+                    raise FileNotFoundError(
+                        f"Model directory '{self.model_directory_separately.format(parameter)}' does not exist; "
+                        "expected to find ensemble files matching 'result_????.nc'."
                 )
-            self._n_ens_members_separately=len(list(path_model.glob('result_????.nc')))
-            if self._n_ens_members_separately <= 0:
-                raise FileNotFoundError(
-                    f"No ensemble members found in directory '{self.model_directory_separately.format(parameter)}'. "
-                    "Expected at least one file matching 'result_????.nc'."
-                )
-            # print(f'Found {self.n_ens_members_separately} in model directory: {path_model}')
+                _n_ens_members_separately=len(list(path_model.glob('result_????.nc')))
+                if _n_ens_members_separately <= 0:
+                    raise FileNotFoundError(
+                        f"No ensemble members found in directory '{self.model_directory_separately.format(parameter)}'. "
+                        "Expected at least one file matching 'result_????.nc'."
+                    )
+                if (self._n_ens_members_separately is not None
+                    and self._n_ens_members_separately!=_n_ens_members_separately):
+                    raise ValueError(
+                        f"Model directory '{self.model_directory_separately.format(parameter)}' contains " f"{_n_ens_members_separately} members, while " f"'{self.model_directory_separately.format(self.perturbed_parameters_listed[par-1])}' " f"contains a different ensemble size ({self._n_ens_members_separately} members)."
+                self._n_ens_members_separately=_n_ens_members_separately
+            # print(f'Found {self._n_ens_members_separately} in model directory: {path_model}')
         return self._n_ens_members_separately
     
     n_ens_members = _property_n_ens_members
